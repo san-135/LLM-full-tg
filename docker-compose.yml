@@ -1,0 +1,90 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5656:5656"
+      - "15656:15656"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6060:6060"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build:
+      context: ./auth_service
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      JWT_SECRET: my_super_secret_key
+      SQLITE_PATH: /app/auth.db
+    volumes:
+      - ./auth_service/data:/app/data
+    depends_on:
+      - rabbitmq
+      - redis
+
+  bot-service:
+    build:
+      context: ./bot_service
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      JWT_SECRET: my_super_secret_key
+      REDIS_URL: redis://redis:6060/0
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5656//
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: openrouter/free
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery-worker:
+    build:
+      context: ./bot_service
+    networks:
+      - app-network
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    command: uv run celery -A app.infra.celery_app worker --loglevel=info
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      JWT_SECRET: my_super_secret_key
+      REDIS_URL: redis://redis:6060/0
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5656//
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+      OPENROUTER_MODEL: openrouter/free
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+networks:
+  app-network:
+    driver: bridge
