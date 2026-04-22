@@ -33,7 +33,7 @@ docker-compose up -d
 ![token](readme_pictures/bot_working.png)
 
 3. Можно увидеть очередь сообщений в [панели RabbitMQ](http://localhost:15672)
-[RabbitMQ](readme_pictures/rabbit.png)
+![RabbitMQ](readme_pictures/rabbit.png)
 
 
 ## Тестирование
