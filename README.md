@@ -3,7 +3,7 @@
 Система состоит из двух независимых сервисов:
 
 - **Auth Service** (FastAPI) — управление пользователями, выпуск JWT.
-- **Bot Service** (aiogram + Celery) — Telegram-бот с доступом к LLM через OpenRouter.
+- **Bot Service** (aiogram + Celery) — Telegram-бот с доступом к LLM сервиса OpenRouter.
 
 ## Архитектура
 - **Auth Service** хранит пользователей в SQLite, выдаёт токен JWT (HS256).
@@ -12,20 +12,19 @@
 
 ## Запуск
 
-### 1. Создайте и заполните файлы с названиями `.env` в каждом сервисе (примеры в `auth_service/.env.example`, `bot_service/.env.example`).
-
-### 2. Запустите инфраструктуру и сервисы через Docker Compose:
+1. Создайте и заполните файлы с названиями `.env` в каждом сервисе (примеры в `auth_service/.env.example`, `bot_service/.env.example`).
+2. Запустите инфраструктуру и сервисы через Docker Compose:
 
 ```
 docker-compose up -d
 ```
 
-3. Использование
+## Использование
 
-Swagger Auth Service: http://localhost:8000/docs
-Зарегистрируйтесь, получите JWT.
-В Telegram найдите вашего бота и отправьте /token [jwt].
-Задавайте вопросы в боте — ответы придут от LLM.
+1. Зайдите в сервис аутентификации: http://localhost:8080/
+2. Зарегистрируйтесь, получите JWT-токен.
+3. В Telegram найдите вашего бота и отправьте /token [ваш jwt].
+4. Задавайте вопросы боту — ответы придут от LLM.
 
 ## Тестирование
 

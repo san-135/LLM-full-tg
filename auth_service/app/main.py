@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 
 from app.api.router import api_router
 from app.core.config import settings
@@ -22,8 +23,18 @@ def create_app() -> FastAPI:
     )
     app.include_router(api_router)
 
+    @app.get("/")
+    async def redirect_to_docs():
+        """
+        Перенаправляем сразу в Swagger UI для удобства.
+        """
+        return RedirectResponse(url="/docs")
+    
     @app.get("/health")
     async def health():
+        """
+        Простая проверка работоспособности сервиса.
+        """
         return {"status": "ok", "environment": settings.env}
 
     return app
