@@ -10,7 +10,7 @@ wheels/
 # Personal data
 .env
 !.env.example
-*.db
+auth_service/data
 
 # Virtual environments
 .venv

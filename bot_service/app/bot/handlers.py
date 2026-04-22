@@ -12,8 +12,25 @@ from app.infra.celery_app import celery_app
 llm_request.bind(celery_app)
 
 
-
 router = Router()
+
+
+@router.message(Command("start"))
+async def cmd_start(message: types.Message):
+    """Приветственное сообщение и инструкция."""
+    welcome_text = (
+        "👋 Привет! Я бот для общения с LLM через OpenRouter.\n\n"
+        "Чтобы начать, тебе нужно получить JWT-токен в Auth Service и передать его мне.\n\n"
+        "📌 <b>Порядок действий:</b>\n"
+        "1. Зарегистрируйся и войди в Swagger Auth Service (обычно http://localhost:8000/docs).\n"
+        "2. Выполни <code>POST /auth/login</code>, получи <code>access_token</code>.\n"
+        "3. Отправь мне команду <code>/token ТВОЙ_JWT_ТОКЕН</code>.\n\n"
+        "После этого можешь задавать любые вопросы, и я передам их нейросети!\n\n"
+        "ℹ️ Команды:\n"
+        "/start – это сообщение\n"
+        "/token &lt;jwt&gt; – сохранить токен для доступа"
+    )
+    await message.answer(welcome_text, parse_mode="HTML")
 
 
 @router.message(Command("token"))

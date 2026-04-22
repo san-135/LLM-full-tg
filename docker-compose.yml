@@ -2,8 +2,8 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-      - "5656:5656"
-      - "15656:15656"
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - app-network
     healthcheck:
@@ -15,7 +15,7 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - "6060:6060"
+      - "6379:6379"
     networks:
       - app-network
     healthcheck:
@@ -28,7 +28,7 @@ services:
     build:
       context: ./auth_service
     ports:
-      - "8080:8080"
+      - "8000:8000"
     networks:
       - app-network
     environment:
@@ -44,7 +44,7 @@ services:
     build:
       context: ./bot_service
     ports:
-      - "8081:8081"
+      - "8001:8001"
     networks:
       - app-network
     dns:
@@ -53,8 +53,8 @@ services:
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       JWT_SECRET: my_super_secret_key
-      REDIS_URL: redis://redis:6060/0
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5656//
+      REDIS_URL: redis://redis:6379/0
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672//
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       OPENROUTER_MODEL: openrouter/free
     depends_on:
@@ -75,8 +75,8 @@ services:
     environment:
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       JWT_SECRET: my_super_secret_key
-      REDIS_URL: redis://redis:6060/0
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5656//
+      REDIS_URL: redis://redis:6379/0
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672//
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       OPENROUTER_MODEL: openrouter/free
     depends_on:
